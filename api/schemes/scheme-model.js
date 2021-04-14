@@ -37,11 +37,14 @@ async function findById(scheme_id) {
   .orderBy("steps.step_number", "asc")
 
   const steps = rows.map(row => {
-    return {
-      "step_id": row["step_id"],
-      "step_number": row["step_number"],
-      "instructions": row["instructions"]
-    }
+      const result = (row.step_id === null)
+        ? []
+        : {
+            "step_id": row["step_id"],
+            "step_number": row["step_number"],
+            "instructions": row["instructions"]
+        }
+    return result
   })
 
   const cleanScheme = {
@@ -88,13 +91,29 @@ function findSteps(scheme_id) { // EXERCISE C
   */
 }
 
-function add(scheme) { // EXERCISE D
+async function add(scheme) {
+  const rows = await db("schemes").insert({
+    "scheme_name": scheme.scheme_name
+  })
+
+  return db("schemes")
+    .where(("schemes.scheme_name", "=", scheme.scheme_name))
+
   /*
     1D- This function creates a new scheme and resolves to _the newly created scheme_.
   */
 }
 
-function addStep(scheme_id, step) { // EXERCISE E
+function addStep(scheme_id, step) {
+  
+  db("steps").insert({
+    "step_number": step.step_number,
+    "instructions": step.instructions,
+    "scheme_id": scheme_id
+  }).then(() => {
+    return db("steps")
+      .select("steps.step_number", "steps.instructions", "steps.scheme_id")
+  })
   /*
     1E- This function adds a step to the scheme with the given `scheme_id`
     and resolves to _all the steps_ belonging to the given `scheme_id`,
