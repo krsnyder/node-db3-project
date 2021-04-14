@@ -10,9 +10,9 @@ const Schemes = require("./scheme-model")
 */
 const checkSchemeId = async (req, res, next) => {
   try {
-    const checkId = await Schemes.findById(req.params.id)
+    const checkId = await Schemes.findById(req.params.scheme_id)
     if (!checkId) {
-      next({status: 400, message: `scheme with scheme_id ${req.params.id} not found`})
+      res.status(404).json({message: `scheme with scheme_id ${req.params.scheme_id} not found`})
     } else {
       next()
     }
